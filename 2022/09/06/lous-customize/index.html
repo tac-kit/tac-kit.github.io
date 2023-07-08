@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+    <link rel="shortcut icon" href="/images/avatar.png" type="image/x-icon" />
+    <title>
+        
+            Lous主题定制 |
+         
+        TK
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    
+
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+<body>
+    <div class="body-container">
+        <div class="header-wrapper"><header>
+    <div class="header-container">
+        <div class="header-menu-list">
+            <ul>
+            
+                <li>
+                    <a href="/">主页</a>
+                </li>
+            
+            </ul>
+        </div>
+    </div>
+</header>
+</div>
+        <div class="main-wrapper"><main>
+    <div class="main-container">
+        <div class="post-details">
+            
+            <div class="post-title">
+                <h1>Lous主题定制</h1>
+            </div>
+            <div class="post-meta">
+                <span class="post-date">2022/09/06</span>
+            </div>
+            
+            <div class="post-content">
+                <p>最近两天对目前博客使用的<a target="_blank" rel="noopener" href="https://github.com/liuxiaotian/hexo-theme-lous">Lous</a>主题进行了定制，做了一点微小的工作：</p>
+<p>一个是修复了代码框导致正文与顶栏不对齐的问题，解决方法是给<code>pre</code>标签增加<code>max-width: 600px</code>的限制；</p>
+<p>第二个是定制了代码框的外观，增加了阴影（<code>box-shadow</code>），高亮主题改为<a target="_blank" rel="noopener" href="https://github.com/highlightjs/highlight.js/blob/main/src/styles/atom-one-dark-reasonable.css">atom-one-dark-reasonable</a>；</p>
+<p>最后也是最重要的：修改了字体。目前在Windows 10下，博客正文中文为微软雅黑，英文为Segoe UI；等线中文为微软雅黑，英文为Consolas。文章<a target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000038284125">Web 字体 font-family 浅谈</a>详尽地介绍了font-family的相关知识和最佳实践，本次修改参考了博主给出的推荐配置，在此表示感谢。</p>
+<p>最后，让我们来一段代码，<a target="_blank" rel="noopener" href="https://github.com/tac-kit/LeetCodeCpp/blob/main/1-Two-Sum.cpp">1-Two-Sum.cpp</a></p>
+<pre><code class="hljs cpp"><span class="hljs-comment">/*</span>
+<span class="hljs-comment">Solution 1: 拷贝数组，新数组排序，双指针找到两个数，然后在原数组中查找这两个数的下标。</span>
+<span class="hljs-comment">时间复杂度：排序O(nlogn)，查找O(2n)，合并O(nlogn)。空间复杂度：O(n)。</span>
+<span class="hljs-comment">Solution 2: 使用字典存储经过的数与下标，计算target-nums[idx]是否在字典中。</span>
+<span class="hljs-comment">时间复杂度：O(n)，空间复杂度O(n)。</span>
+<span class="hljs-comment">*/</span>
+
+<span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;iostream&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;vector&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;cassert&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;algorithm&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;unordered_map&gt;</span></span>
+
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
+
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;
+<span class="hljs-keyword">public</span>:
+    <span class="hljs-function">vector&lt;<span class="hljs-type">int</span>&gt; <span class="hljs-title">twoSum</span><span class="hljs-params">(<span class="hljs-type">const</span> vector&lt;<span class="hljs-type">int</span>&gt;&amp; nums, <span class="hljs-type">int</span> target)</span></span>&#123;
+        <span class="hljs-comment">// assume that each input would have exactly one solution</span>
+        unordered_map&lt;<span class="hljs-type">int</span>, <span class="hljs-type">int</span>&gt; num_idx_dict;  <span class="hljs-comment">// value -&gt; index</span>
+        vector&lt;<span class="hljs-type">int</span>&gt; res;
+        <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> idx=<span class="hljs-number">0</span>; idx&lt;nums.<span class="hljs-built_in">size</span>(); ++idx)&#123;
+            <span class="hljs-keyword">auto</span> find_iter = num_idx_dict.<span class="hljs-built_in">find</span>(target-nums[idx]);
+            <span class="hljs-keyword">if</span> (find_iter == num_idx_dict.<span class="hljs-built_in">end</span>())&#123;
+                <span class="hljs-comment">// <span class="hljs-doctag">NOTE:</span> emplace的接口类似pair</span>
+                <span class="hljs-comment">// num_idx_dict.emplace(nums[idx], idx);</span>
+                <span class="hljs-comment">// <span class="hljs-doctag">NOTE:</span> 也可以直接用下标增加元素</span>
+                num_idx_dict[nums[idx]] = idx;
+            &#125;<span class="hljs-keyword">else</span>&#123;
+                <span class="hljs-comment">// <span class="hljs-doctag">NOTE:</span> 如果访问map的迭代器，接口类似pair</span>
+                <span class="hljs-comment">// res.push_back((*find_iter).second);</span>
+                <span class="hljs-comment">// <span class="hljs-doctag">NOTE:</span> 如果是通过下标访问，返回值</span>
+                res.<span class="hljs-built_in">push_back</span>(num_idx_dict[target-nums[idx]]);
+                res.<span class="hljs-built_in">push_back</span>(idx);
+                <span class="hljs-keyword">break</span>;
+            &#125;
+        &#125;
+        <span class="hljs-keyword">return</span> res;
+    &#125;
+&#125;;
+
+<span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>&#123;
+    Solution s;
+    vector&lt;<span class="hljs-type">int</span>&gt; res = s.<span class="hljs-built_in">twoSum</span>(vector&lt;<span class="hljs-type">int</span>&gt;&#123;<span class="hljs-number">2</span>,<span class="hljs-number">7</span>,<span class="hljs-number">11</span>,<span class="hljs-number">15</span>&#125;, <span class="hljs-number">9</span>);
+    vector&lt;<span class="hljs-type">int</span>&gt; ans&#123;<span class="hljs-number">0</span>,<span class="hljs-number">1</span>&#125;;
+    <span class="hljs-built_in">assert</span>(res == ans);
+&#125;</code></pre>
+<p>貌似这个高亮主题与Lous有点不搭😅？等下一期再做吧😎。</p>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+  
+
+</div>
+        <div class="footer-wrapper"><footer>
+    <div class="footer-container">
+        <div class="footer-meta">
+            
+                <div class="footer-meta-copyright">
+                    &copy; 2023 tac-kit.
+                </div>
+            
+            
+        </div>
+    </div>
+</footer>
+</div>
+    </div>
+</body>
+</html>
