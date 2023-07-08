@@ -154,6 +154,7 @@ pre {
   font-size: 0.9em;
 }
 .post-details .post-content p {
+  text-align: justify;
   margin-block: 0;
   line-height: 1.8em;
 }
