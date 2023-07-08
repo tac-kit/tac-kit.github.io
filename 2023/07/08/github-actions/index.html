@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+    <link rel="shortcut icon" href="/images/avatar.png" type="image/x-icon" />
+    <title>
+        
+            基于GitHub Actions的Hexo博客自动发布改造 |
+         
+        TK
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+    <div class="body-container">
+        <div class="header-wrapper"><header>
+    <div class="header-container">
+        <div class="header-menu-list">
+            <ul>
+            
+                <li>
+                    <a href="/">主页</a>
+                </li>
+            
+            </ul>
+        </div>
+    </div>
+</header>
+</div>
+        <div class="main-wrapper"><main>
+    <div class="main-container">
+        <div class="post-details">
+            
+            <div class="post-title">
+                <h1>基于GitHub Actions的Hexo博客自动发布改造</h1>
+            </div>
+            <div class="post-meta">
+                <span class="post-date">2023/07/08</span>
+            </div>
+            
+            <div class="post-content">
+                <p>根据<a target="_blank" rel="noopener" href="https://yaoyuanyy.github.io/2022/02/28/GitHub-Actions%E5%AE%9E%E7%8E%B0Hexo%E5%8D%9A%E5%AE%A2%E8%87%AA%E5%8A%A8%E5%8F%91%E5%B8%83/">博客A</a>，跑通了GitHub Actions，但未能实现GitHub Pages的自动发布。这篇博客总的步骤没有问题，但提供的hexo-deploy.yml缺少了发布到公开仓库的步骤。<br>参考<a target="_blank" rel="noopener" href="https://zexiplus.github.io/tech-blog/2020/09/21/hexo/">博客B</a>进行修改，得到可用的hexo-deploy.yml文件如下：</p>
+<pre><code class="hljs yaml"><span class="hljs-attr">name:</span> <span class="hljs-string">Hexo</span> <span class="hljs-string">Deploy</span>
+<span class="hljs-comment"># 只监听 main 分支的改动</span>
+<span class="hljs-attr">on:</span>
+  <span class="hljs-attr">push:</span>
+    <span class="hljs-attr">branches:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">main</span>
+
+<span class="hljs-comment"># 自定义环境变量，这个GIT_USER和GIT_EMAIL配置成你自己的，GIT_EMAIL尽量和上面的`ssh-keygen -f hexo-deploy-key -C &quot;your email&quot;`中的your email保持一致</span>
+<span class="hljs-attr">env:</span>
+  <span class="hljs-attr">GIT_USER:</span> <span class="hljs-string">your</span> <span class="hljs-string">user</span> <span class="hljs-string">name</span>
+  <span class="hljs-attr">GIT_EMAIL:</span> <span class="hljs-string">your</span> <span class="hljs-string">email</span> <span class="hljs-string">addr</span>
+
+<span class="hljs-attr">jobs:</span>
+  <span class="hljs-attr">build-and-deploy:</span>
+    <span class="hljs-attr">runs-on:</span> <span class="hljs-string">ubuntu-latest</span>
+
+    <span class="hljs-attr">steps:</span>
+      <span class="hljs-comment"># 获取博客源码（即Actions所在仓库源码）</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Checkout</span>
+        <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/checkout@v2</span>
+
+      <span class="hljs-comment"># Node.js</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Set</span> <span class="hljs-string">up</span> <span class="hljs-string">Node.js</span>
+        <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/setup-node@v1</span>
+        <span class="hljs-attr">with:</span>
+          <span class="hljs-attr">node-version:</span> <span class="hljs-string">&#x27;12&#x27;</span>
+
+      <span class="hljs-comment"># 安装依赖</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Install</span> <span class="hljs-string">Dependencies</span>
+        <span class="hljs-attr">run:</span> <span class="hljs-string">|</span>
+<span class="hljs-string">          npm install</span>
+<span class="hljs-string"></span>
+      <span class="hljs-comment"># 生成HTML文件</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Deploy</span>
+        <span class="hljs-attr">run:</span> <span class="hljs-string">|</span>
+<span class="hljs-string">          npx hexo clean &amp;&amp; npx hexo g</span>
+<span class="hljs-string"></span>      
+      <span class="hljs-comment"># 发布到公开仓库</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Deploy</span> <span class="hljs-string">To</span> <span class="hljs-string">Blog</span>
+        <span class="hljs-attr">uses:</span> <span class="hljs-string">peaceiris/actions-gh-pages@v3</span>
+        <span class="hljs-attr">with:</span>
+          <span class="hljs-attr">deploy_key:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">secrets.HEXO_DEPLOY_PRI</span> <span class="hljs-string">&#125;&#125;</span>  <span class="hljs-comment"># 按「博客A」步骤配置</span>
+          <span class="hljs-attr">external_repository:</span> <span class="hljs-string">tac-kit/tac-kit.github.io</span>  <span class="hljs-comment"># github.io公开仓库地址</span>
+          <span class="hljs-attr">publish_dir:</span> <span class="hljs-string">./public</span>
+          <span class="hljs-attr">publish_branch:</span> <span class="hljs-string">pages</span></code></pre>
+            </div>
+        </div>
+    </div>
+</main>
+
+  
+
+</div>
+        <div class="footer-wrapper"><footer>
+    <div class="footer-container">
+        <div class="footer-meta">
+            
+                <div class="footer-meta-copyright">
+                    &copy; 2023 tac-kit.
+                </div>
+            
+            
+        </div>
+    </div>
+</footer>
+</div>
+    </div>
+</body>
+</html>
