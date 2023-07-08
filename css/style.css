@@ -212,13 +212,17 @@ pre {
   margin-top: 5px;
   margin-bottom: 5px;
 }
-pre code.hljs {
-  display: block;
-  overflow-x: auto;
-  padding: 1em;
+code.hljs::-webkit-scrollbar {
+/* WebKit 去滚动条 */
+  width: 0;
+  height: 0;
 }
 code.hljs {
   padding: 3px 5px;
+  display: block;
+  overflow-x: auto;
+  scrollbar-width: none; /* Firefox 去滚动条 */
+  padding: 1em;
 }
 .hljs {
   color: #abb2bf;
