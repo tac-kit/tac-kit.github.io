@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+    <link rel="shortcut icon" href="/images/avatar.png" type="image/x-icon" />
+    <title>
+        
+            Java笔记-日期时间 |
+         
+        TK
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+    <div class="body-container">
+        <div class="header-wrapper"><header>
+    <div class="header-container">
+        <div class="header-menu-list">
+            <ul>
+            
+                <li>
+                    <a href="/">主页</a>
+                </li>
+            
+            </ul>
+        </div>
+    </div>
+</header>
+</div>
+        <div class="main-wrapper"><main>
+    <div class="main-container">
+        <div class="post-details">
+            
+            <div class="post-title">
+                <h1>Java笔记-日期时间</h1>
+            </div>
+            <div class="post-meta">
+                <span class="post-date">2023/07/09</span>
+            </div>
+            
+            <div class="post-content">
+                <h1 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h1><h2 id="常用类"><a href="#常用类" class="headerlink" title="常用类"></a>常用类</h2><p><a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/8/docs/api/java/time/package-summary.html">java.time包</a>包含处理日期时间所需的类。常用的类有：</p>
+<ul>
+<li>Instant: An instantaneous point on the time-line.</li>
+<li>LocalDateTime: A date-time <strong>without a time-zone</strong> in the ISO-8601 calendar system, such as 2007-12-03T10:15:30.</li>
+<li>ZonedDateTime: A date-time <strong>with a time-zone</strong> in the ISO-8601 calendar system, such as 2007-12-03T10:15:30+01:00 Europe&#x2F;Paris.</li>
+</ul>
+<h2 id="时间戳与时间的区别"><a href="#时间戳与时间的区别" class="headerlink" title="时间戳与时间的区别"></a>时间戳与时间的区别</h2><p>任意时刻，全球只有一个时间戳Instant；但每个地点的本地时间LocalDateTime可能不同。<br>举例：时间戳1688871330，对应北京时间2023-07-09T10:55:30，对应伦敦时间2023-07-09T03:55:30。</p>
+<pre><code class="hljs java"><span class="hljs-meta">@Test</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">convertEpochSecondToLocalDateTimeTest</span><span class="hljs-params">()</span> &#123;
+    System.out.println(Instant.ofEpochSecond(<span class="hljs-number">1688871330</span>).atZone(ZoneId.of(<span class="hljs-string">&quot;Asia/Shanghai&quot;</span>)).toLocalDateTime());
+    System.out.println(Instant.ofEpochSecond(<span class="hljs-number">1688871330</span>).atZone(ZoneId.of(<span class="hljs-string">&quot;Europe/London&quot;</span>)).toLocalDateTime());
+&#125;</code></pre>
+
+<p>反过来也是一样。不同地点的LocalDateTime相同，对应的Instant很可能不同。<strong>因此，在将LocalDateTime转换为Instant时，一定要带上准确的时区信息。</strong><br>举例：本地时间2023-07-09T10:55:30，按北京时间转换得到时间戳1688871330，按伦敦时间转换得到时间戳1688896530。</p>
+<pre><code class="hljs java"><span class="hljs-meta">@Test</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">convertLocalDateTimeToEpochSecondTest</span><span class="hljs-params">()</span> &#123;
+    System.out.println(LocalDateTime.of(<span class="hljs-number">2023</span>, <span class="hljs-number">7</span>, <span class="hljs-number">9</span>, <span class="hljs-number">10</span>, <span class="hljs-number">55</span>, <span class="hljs-number">30</span>).atZone(ZoneId.of(<span class="hljs-string">&quot;Asia/Shanghai&quot;</span>)).toEpochSecond());
+    System.out.println(LocalDateTime.of(<span class="hljs-number">2023</span>, <span class="hljs-number">7</span>, <span class="hljs-number">9</span>, <span class="hljs-number">10</span>, <span class="hljs-number">55</span>, <span class="hljs-number">30</span>).atZone(ZoneId.of(<span class="hljs-string">&quot;Europe/London&quot;</span>)).toEpochSecond());
+&#125;</code></pre>
+<p>反例：获取本地时间后使用UTC时区转换为时间戳。如果本地时间不是UTC时区，那么这样拿到的时间戳会存在偏移。</p>
+<pre><code class="hljs java"><span class="hljs-meta">@Test</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">wrongUsageOfLocalDateTimeTest</span><span class="hljs-params">()</span> &#123;
+    System.out.println(LocalDateTime.now().toEpochSecond(ZoneOffset.UTC));
+&#125;</code></pre>
+
+<h1 id="最佳实践"><a href="#最佳实践" class="headerlink" title="最佳实践"></a>最佳实践</h1><h2 id="获取当前时间戳"><a href="#获取当前时间戳" class="headerlink" title="获取当前时间戳"></a>获取当前时间戳</h2><p>ZonedDateTime和Instant都可以拿到当前时间戳。语义上Instant更合适。</p>
+<pre><code class="hljs java"><span class="hljs-meta">@Test</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">getEpochSecondTest</span><span class="hljs-params">()</span> &#123;
+    System.out.println(ZonedDateTime.now().toEpochSecond());
+    System.out.println(Instant.now().getEpochSecond());
+&#125;</code></pre>
+<h2 id="获取指定格式时间字符串"><a href="#获取指定格式时间字符串" class="headerlink" title="获取指定格式时间字符串"></a>获取指定格式时间字符串</h2><pre><code class="hljs java"><span class="hljs-meta">@Test</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">getISOFormatTest</span><span class="hljs-params">()</span> &#123;
+    System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern(<span class="hljs-string">&quot;yyyy-MM-dd HH:mm:ss&quot;</span>)));
+&#125;</code></pre>
+            </div>
+        </div>
+    </div>
+</main>
+
+  
+
+</div>
+        <div class="footer-wrapper"><footer>
+    <div class="footer-container">
+        <div class="footer-meta">
+            
+                <div class="footer-meta-copyright">
+                    &copy; 2023 tac-kit.
+                </div>
+            
+            
+            <div>
+                Theme by <a target="_blank" rel="noopener" href="https://github.com/liuxiaotian/hexo-theme-lous">Lous</a>
+            </div>
+            <div>
+                Powered by <a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/">Hexo</a>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+    </div>
+</body>
+</html>
