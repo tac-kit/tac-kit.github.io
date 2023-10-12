@@ -1,9 +1,9 @@
 .post-details {
-  color: #555;
-  font-size: 15px;
+  color: #000;
+  font-size: 14px;
   width: 100%;
   margin: 0 10px;
-  inline-height: 1.8em;
+  line-height: 22.4px;
 }
 .post-details a:not(.nonstyle) {
   text-decoration: none;
@@ -18,8 +18,8 @@
 }
 .post-details .post-title h1 {
   color: #222;
-  font-size: 1.5em;
-  font-weight: normal;
+  font-size: 1.7em;
+  font-weight: 500;
   margin-block: 0;
 }
 .post-details .post-meta {
@@ -33,15 +33,15 @@
 .post-details .post-content h4,
 .post-details .post-content h5,
 .post-details .post-content h6 {
-  color: #222;
   margin-block: 0;
   margin-inline: 0;
-  margin-top: 20px;
-  margin-bottom: 15px;
+  margin-top: 15px;
+  margin-bottom: 10px;
   line-height: 1.2em;
 }
 .post-details .post-content h1 {
-  font-size: 1.4em;
+  margin-top: 30px;
+  font-size: 1.5em;
 }
 .post-details .post-content h2 {
   font-size: 1.3em;
@@ -61,7 +61,6 @@
 .post-details .post-content p {
   text-align: justify;
   margin-block: 0;
-  line-height: 1.8em;
 }
 .post-details .post-content p:not(:last-child) {
   margin: 0 0 10px;
@@ -110,6 +109,9 @@
 .post-details .post-content table {
   margin: 1em 0;
   width: 100%;
+}
+.post-details .post-content ul {
+  padding-inline-start: 20px;
 }
 .katex > .katex-html {
   white-space: normal;
