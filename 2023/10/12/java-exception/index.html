@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+    <link rel="shortcut icon" href="/images/avatar.png" type="image/x-icon" />
+    <title>
+        
+            Java笔记-异常 |
+         
+        TK
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+    <div class="body-container">
+        <div class="header-wrapper"><header>
+    <div class="header-container">
+        <div class="header-menu-list">
+            <ul>
+            
+                <li>
+                    <a href="/">主页</a>
+                </li>
+            
+            </ul>
+        </div>
+    </div>
+</header>
+</div>
+        <div class="main-wrapper"><main>
+    <div class="main-container">
+        <div class="post-details">
+            
+            <div class="post-title">
+                <h1>Java笔记-异常</h1>
+            </div>
+            <div class="post-meta">
+                <span class="post-date">2023/10/12</span>
+            </div>
+            
+            <div class="post-content">
+                <h1 id="继承关系"><a href="#继承关系" class="headerlink" title="继承关系"></a>继承关系</h1><ul>
+<li>Throwable<ul>
+<li>Exception<ul>
+<li>RuntimeException</li>
+</ul>
+</li>
+<li>Error</li>
+</ul>
+</li>
+</ul>
+<h1 id="分类"><a href="#分类" class="headerlink" title="分类"></a>分类</h1><p>Error：JVM出现的问题，无法被<code>try-catch</code>。例如：OutOfMemoryError。<br>Exception：程序可处理的异常，可通过<code>try-catch</code>捕获并恢复。具体分为：</p>
+<ul>
+<li>非检查异常：RuntimeException及其子类型，也叫运行时异常；例如：NullPointerException。</li>
+<li>检查异常：除RuntimeException以外的异常；调用方必须处理，要么捕获要么向上抛（方法签名加上<code>throws</code>）；例如：Jackson反序列化需要处理com.fasterxml.jackson.core.JsonProcessingException。</li>
+</ul>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+  
+
+</div>
+        <div class="footer-wrapper"><footer>
+    <div class="footer-container">
+        <div class="footer-meta">
+            
+                <div class="footer-meta-copyright">
+                    &copy; 2023 tac-kit.
+                </div>
+            
+            
+            <div>
+                Theme by <a target="_blank" rel="noopener" href="https://github.com/liuxiaotian/hexo-theme-lous">Lous</a>
+            </div>
+            <div>
+                Powered by <a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/">Hexo</a>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+    </div>
+</body>
+</html>
