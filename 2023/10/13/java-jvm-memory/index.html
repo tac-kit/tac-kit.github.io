@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+    <link rel="shortcut icon" href="/images/avatar.png" type="image/x-icon" />
+    <title>
+        
+            Java笔记-JVM内存模型 |
+         
+        TK
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+    <div class="body-container">
+        <div class="header-wrapper"><header>
+    <div class="header-container">
+        <div class="header-menu-list">
+            <ul>
+            
+                <li>
+                    <a href="/">主页</a>
+                </li>
+            
+            </ul>
+        </div>
+    </div>
+</header>
+</div>
+        <div class="main-wrapper"><main>
+    <div class="main-container">
+        <div class="post-details">
+            
+            <div class="post-title">
+                <h1>Java笔记-JVM内存模型</h1>
+            </div>
+            <div class="post-meta">
+                <span class="post-date">2023/10/13</span>
+            </div>
+            
+            <div class="post-content">
+                <h1 id="基础"><a href="#基础" class="headerlink" title="基础"></a>基础</h1><h2 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h2><ul>
+<li>弱分代假说（weak generational hypothesis）：多数对象的生命周期很短。</li>
+<li>分代回收（generational collection）：基于弱分代假说，将内存空间分为多个区域（代），在每一代填满时执行垃圾回收；不同代使用不同的垃圾回收算法。</li>
+</ul>
+<h2 id="内存结构"><a href="#内存结构" class="headerlink" title="内存结构"></a>内存结构</h2><p>Java程序内存结构：</p>
+<ul>
+<li>堆内存（Heap Space）<ul>
+<li>新生代（Young Gen）<ul>
+<li>Eden</li>
+<li>Survivor 0&#x2F;1</li>
+</ul>
+</li>
+<li>老生代（Old Gen）</li>
+</ul>
+</li>
+<li>栈内存（Stack）</li>
+<li>堆外内存（Non-heap Space）</li>
+</ul>
+<h1 id="垃圾回收"><a href="#垃圾回收" class="headerlink" title="垃圾回收"></a>垃圾回收</h1><h2 id="如何查找垃圾"><a href="#如何查找垃圾" class="headerlink" title="如何查找垃圾"></a>如何查找垃圾</h2><ul>
+<li>引用计数：将引用数量为0的对象定义为垃圾；缺点是无法处理循环引用。</li>
+<li>可达性分析：从根结点开始遍历并标记，将没有标记的对象定义为垃圾。</li>
+</ul>
+<h2 id="回收算法"><a href="#回收算法" class="headerlink" title="回收算法"></a>回收算法</h2><ul>
+<li>标记-清除（Mark-Sweep）：第一阶段遍历并标记对象，第二阶段将未标记对象对应的内存空间标记为未使用。优点是不存在内存复制，缺点是可能产生内存碎片。</li>
+<li>标记-整理（Mark-Compact）：与标记-清除相比，第一阶段不变，第二阶段会将存活对象按一定算法进行整理。优点是内存碎片少，缺点是内存复制频率高、效率差。</li>
+<li>复制（Copying）：将内存空间分为两个半区，同一时间只使用其中一个半区。每次回收将一个半区的存活对象复制到另一个半区。优点是内存碎片少，缺点是浪费一半内存。</li>
+</ul>
+<p>回收算法差异：内存利用率、内存连续度、是否移动对象、时间开销</p>
+<h2 id="性能评估"><a href="#性能评估" class="headerlink" title="性能评估"></a>性能评估</h2><p>评估指标：</p>
+<ul>
+<li>吞吐量（throughput）：普通应用，单次GC耗时远小于网络延迟，因此更关注GC频率对吞吐量的影响。</li>
+<li>延迟（latency）：少数应用需要实现毫秒级延迟，因此更关注单次GC耗时。</li>
+</ul>
+<h2 id="垃圾回收器"><a href="#垃圾回收器" class="headerlink" title="垃圾回收器"></a>垃圾回收器</h2><p>JDK 17提供4个垃圾回收器：</p>
+<ul>
+<li>Serial</li>
+<li>Parallel</li>
+<li>Garbage-First (G1)</li>
+<li>ZGC</li>
+</ul>
+<h1 id="命令行参数"><a href="#命令行参数" class="headerlink" title="命令行参数"></a>命令行参数</h1><ul>
+<li>-Xms<em>size</em>：设置堆内存最小值和初始值。</li>
+<li>-Xmx<em>size</em>：设置堆内存最大值。服务端通常将-Xms和-Xmx设置成一样的值。</li>
+<li>-Xss<em>size</em>：设置线程栈内存大小。</li>
+<li>-XX:+HeapDumpOnOutOfMemoryError：在发生OutOfMemoryError时，将堆dump到磁盘，用于排查OOM问题。</li>
+</ul>
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><p><a target="_blank" rel="noopener" href="https://docs.oracle.com/en/java/javase/17/gctuning/garbage-collector-implementation.html">https://docs.oracle.com/en/java/javase/17/gctuning/garbage-collector-implementation.html</a><br><a target="_blank" rel="noopener" href="https://tech.meituan.com/2020/11/12/java-9-cms-gc.html">https://tech.meituan.com/2020/11/12/java-9-cms-gc.html</a><br><a target="_blank" rel="noopener" href="https://docs.oracle.com/en/java/javase/17/docs/specs/man/java.html">https://docs.oracle.com/en/java/javase/17/docs/specs/man/java.html</a></p>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+  
+
+</div>
+        <div class="footer-wrapper"><footer>
+    <div class="footer-container">
+        <div class="footer-meta">
+            
+                <div class="footer-meta-copyright">
+                    &copy; 2023 tac-kit.
+                </div>
+            
+            
+            <div>
+                Theme by <a target="_blank" rel="noopener" href="https://github.com/liuxiaotian/hexo-theme-lous">Lous</a>
+            </div>
+            <div>
+                Powered by <a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/">Hexo</a>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+    </div>
+</body>
+</html>
