@@ -54,7 +54,61 @@
 <h1 id="变种"><a href="#变种" class="headerlink" title="变种"></a>变种</h1><h2 id="Base64-URL-Safe"><a href="#Base64-URL-Safe" class="headerlink" title="Base64 URL Safe"></a>Base64 URL Safe</h2><p>Base64输出包含<code>+</code>和<code>/</code>两个特殊字符，在URL中可能引起问题。<br>Base64 URL Safe将<code>+/</code>替换为<code>-_</code>，以避免上述问题。</p>
 <h2 id="Base62"><a href="#Base62" class="headerlink" title="Base62"></a>Base62</h2><p>在Base64基础上，去掉<code>+</code>和<code>/</code>两个特殊字符，仅保留数字、字母大小写。</p>
 <h2 id="Base58"><a href="#Base58" class="headerlink" title="Base58"></a>Base58</h2><p>在Base62基础上，去掉<code>0</code> (数字0)、<code>I</code> (大写字母 i)、<code>O</code> (大写字母 o) 和 <code>l</code> (小写字母 L)，方便人阅读，避免歧义。</p>
-<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><p><a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Glossary/Base64">https://developer.mozilla.org/en-US/docs/Glossary/Base64</a><br><a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Base62">https://en.wikipedia.org/wiki/Base62</a></p>
+<h1 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h1><h2 id="Python"><a href="#Python" class="headerlink" title="Python"></a>Python</h2><p>编码Base64：</p>
+<pre><code class="hljs py"><span class="hljs-meta">&gt;&gt;&gt; </span><span class="hljs-keyword">import</span> base64
+<span class="hljs-meta">&gt;&gt;&gt; </span>input_string = <span class="hljs-string">&#x27;Base64输出包含+和/两个特殊字符&#x27;</span>
+<span class="hljs-meta">&gt;&gt;&gt; </span>input_string_bytes = input_string.encode(<span class="hljs-string">&#x27;utf-8&#x27;</span>)
+<span class="hljs-meta">&gt;&gt;&gt; </span><span class="hljs-built_in">print</span>(input_string_bytes)
+<span class="hljs-string">b&#x27;Base64\xe8\xbe\x93\xe5\x87\xba\xe5\x8c\x85\xe5\x90\xab+\xe5\x92\x8c/\xe4\xb8\xa4\xe4\xb8\xaa\xe7\x89\xb9\xe6\xae\x8a\xe5\xad\x97\xe7\xac\xa6&#x27;</span>
+<span class="hljs-meta">&gt;&gt;&gt; </span>base64.standard_b64encode(input_string_bytes)  <span class="hljs-comment"># 标准Base64编码</span>
+<span class="hljs-string">b&#x27;QmFzZTY06L6T5Ye65YyF5ZCrK+WSjC/kuKTkuKrnibnmrorlrZfnrKY=&#x27;</span>
+<span class="hljs-meta">&gt;&gt;&gt; </span>base64.urlsafe_b64encode(input_string_bytes)  <span class="hljs-comment"># Base64 URL Safe编码</span>
+<span class="hljs-string">b&#x27;QmFzZTY06L6T5Ye65YyF5ZCrK-WSjC_kuKTkuKrnibnmrorlrZfnrKY=&#x27;</span></code></pre>
+
+<p>需要区分两种“编码”：</p>
+<ul>
+<li>UTF-8将Unicode字符串“编码”为二进制数据；</li>
+<li>Base64将二进制数据“编码”为ASCII字符串。</li>
+</ul>
+<p>传统字符编码（例如UTF-8）将各种字符（特别是汉字等非ASCII字符）转换为二进制数据，以便于计算机本地存储；Base64属于<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Binary-to-text_encoding">二进制到文本编码</a>，这类编码的目标是在Email、HTML等纯文本格式里表示二进制数据，因此将二进制数据转换为ASCII字符串。</p>
+<p><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/42773386/why-does-base64-b64encode-return-a-bytes-object">既然Base64将二进制字节编码为ASCII字符，为什么b64encode返回bytes对象？</a>原因主要有两点：一是避免重复来回转换，二是遵守“‘编码’是将字符串转换为二进制”的范式。</p>
+<p>解码Base64：</p>
+<pre><code class="hljs py"><span class="hljs-meta">&gt;&gt;&gt; </span><span class="hljs-keyword">import</span> base64
+<span class="hljs-meta">&gt;&gt;&gt; </span>input_string = <span class="hljs-string">&#x27;QmFzZTY06L6T5Ye65YyF5ZCrK+WSjC/kuKTkuKrnibnmrorlrZfnrKY=&#x27;</span>
+<span class="hljs-meta">&gt;&gt;&gt; </span>base64.standard_b64decode(input_string)
+<span class="hljs-string">b&#x27;Base64\xe8\xbe\x93\xe5\x87\xba\xe5\x8c\x85\xe5\x90\xab+\xe5\x92\x8c/\xe4\xb8\xa4\xe4\xb8\xaa\xe7\x89\xb9\xe6\xae\x8a\xe5\xad\x97\xe7\xac\xa6&#x27;</span>
+<span class="hljs-meta">&gt;&gt;&gt; </span>base64.standard_b64decode(input_string).decode(<span class="hljs-string">&#x27;utf-8&#x27;</span>)
+<span class="hljs-string">&#x27;Base64输出包含+和/两个特殊字符&#x27;</span></code></pre>
+
+<h2 id="Java"><a href="#Java" class="headerlink" title="Java"></a>Java</h2><p>编码Base64：</p>
+<pre><code class="hljs java"><span class="hljs-meta">@Test</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">base64EncodeTest</span><span class="hljs-params">()</span> &#123;
+    <span class="hljs-type">String</span> <span class="hljs-variable">inputString</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;Base64输出包含+和/两个特殊字符&quot;</span>;
+    <span class="hljs-type">byte</span>[] inputStringBytes = inputString.getBytes(StandardCharsets.UTF_8);
+    System.out.println(<span class="hljs-keyword">new</span> <span class="hljs-title class_">String</span>(Base64.getEncoder().encode(inputStringBytes), StandardCharsets.US_ASCII));
+    <span class="hljs-comment">// 打印&quot;QmFzZTY06L6T5Ye65YyF5ZCrK+WSjC/kuKTkuKrnibnmrorlrZfnrKY=&quot;</span>
+&#125;</code></pre>
+
+<p>解码Base64：</p>
+<pre><code class="hljs java"><span class="hljs-meta">@Test</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">base64DecodeTest</span><span class="hljs-params">()</span> &#123;
+    <span class="hljs-type">String</span> <span class="hljs-variable">inputString</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;QmFzZTY06L6T5Ye65YyF5ZCrK+WSjC/kuKTkuKrnibnmrorlrZfnrKY=&quot;</span>;
+    System.out.println(<span class="hljs-keyword">new</span> <span class="hljs-title class_">String</span>(Base64.getDecoder().decode(inputString), StandardCharsets.UTF_8));
+    <span class="hljs-comment">// 打印“Base64输出包含+和/两个特殊字符”</span>
+&#125;</code></pre>
+
+<p>解码Base64时，Python和Java都同时支持入参为字符串或字节数组。可能是因为Base64字符串总是可以使用ASCII实现字符编码，因此实现了两个重载方法。Java的<code>byte[] decode(String src)</code>重载方法是对<code>byte[] decode(byte[] src)</code>的封装，内部也是将入参<code>src</code>先用字符编码ISO_8859_1（兼容ASCII）转换为字节数组。</p>
+<p>编码Base64 URL Safe：</p>
+<pre><code class="hljs java"><span class="hljs-meta">@Test</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">base64UrlSafeEncodeTest</span><span class="hljs-params">()</span> &#123;
+    <span class="hljs-type">String</span> <span class="hljs-variable">inputString</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;Base64输出包含+和/两个特殊字符&quot;</span>;
+    <span class="hljs-type">byte</span>[] inputStringBytes = inputString.getBytes(StandardCharsets.UTF_8);
+    System.out.println(<span class="hljs-keyword">new</span> <span class="hljs-title class_">String</span>(Base64.getUrlEncoder().encode(inputStringBytes), StandardCharsets.US_ASCII));
+    <span class="hljs-comment">// 打印&quot;QmFzZTY06L6T5Ye65YyF5ZCrK-WSjC_kuKTkuKrnibnmrorlrZfnrKY=&quot;</span>
+&#125;</code></pre>
+
+<p>编解码Base62：<a target="_blank" rel="noopener" href="https://github.com/seruco/base62">https://github.com/seruco/base62</a></p>
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><p><a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Glossary/Base64">https://developer.mozilla.org/en-US/docs/Glossary/Base64</a><br><a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Base62">https://en.wikipedia.org/wiki/Base62</a><br><a target="_blank" rel="noopener" href="https://docs.python.org/3/library/base64.html">https://docs.python.org/3/library/base64.html</a><br><a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/8/docs/api/java/util/Base64.html">https://docs.oracle.com/javase/8/docs/api/java/util/Base64.html</a></p>
 
             </div>
         </div>
