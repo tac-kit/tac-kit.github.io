@@ -55,6 +55,15 @@
 <h2 id="Linux"><a href="#Linux" class="headerlink" title="Linux"></a>Linux</h2><pre><code class="hljs bash"><span class="hljs-built_in">sha256sum</span> filename</code></pre>
 
 <h2 id="macOS"><a href="#macOS" class="headerlink" title="macOS"></a>macOS</h2><pre><code class="hljs sh">shasum -a 256 filename</code></pre>
+
+<h1 id="MD5"><a href="#MD5" class="headerlink" title="MD5"></a>MD5</h1><h2 id="Windows-1"><a href="#Windows-1" class="headerlink" title="Windows"></a>Windows</h2><p>powershell</p>
+<pre><code class="hljs powershell"><span class="hljs-built_in">Get-FileHash</span> <span class="hljs-literal">-Algorithm</span> MD5 filename</code></pre>
+
+<h1 id="SHA-1"><a href="#SHA-1" class="headerlink" title="SHA-1"></a>SHA-1</h1><h2 id="Windows-2"><a href="#Windows-2" class="headerlink" title="Windows"></a>Windows</h2><p>powershell</p>
+<pre><code class="hljs powershell"><span class="hljs-built_in">Get-FileHash</span> <span class="hljs-literal">-Algorithm</span> SHA1 filename</code></pre>
+
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><p><a target="_blank" rel="noopener" href="https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/get-filehash?view=powershell-7.3">https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/get-filehash?view=powershell-7.3</a></p>
+
             </div>
         </div>
     </div>
