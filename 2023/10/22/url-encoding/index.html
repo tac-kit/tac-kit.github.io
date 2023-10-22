@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+    <link rel="shortcut icon" href="/images/avatar.png" type="image/x-icon" />
+    <title>
+        
+            URL encoding |
+         
+        TK
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+    <div class="body-container">
+        <div class="header-wrapper"><header>
+    <div class="header-container">
+        <div class="header-menu-list">
+            <ul>
+            
+                <li>
+                    <a href="/">主页</a>
+                </li>
+            
+                <li>
+                    <a target="_blank" rel="noopener" href="https://github.com/tac-kit">GitHub</a>
+                </li>
+            
+            </ul>
+        </div>
+    </div>
+</header>
+</div>
+        <div class="main-wrapper"><main>
+    <div class="main-container">
+        <div class="post-details">
+            
+            <div class="post-title">
+                <h1>URL encoding</h1>
+            </div>
+            <div class="post-meta">
+                <span class="post-date">2023/10/22</span>
+            </div>
+            
+            <div class="post-content">
+                <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>URL中某些字符具有特殊含义，比如<code>/</code>用于路径，<code>?=&amp;</code>用于表示GET请求的参数；URL只允许ASCII字符，无法直接表示非ASCII字符，例如汉字。通常使用URL encoding来表示上述字符，形式是<code>%&#123;字符的十六进制UTF-8编码值&#125;</code>。因为有百分号<code>%</code>前缀，所以这种编码又称为百分号编码（Percent-encoding）。</p>
+<p>举例：在Google搜索“python 百分号编码”，对应的URL为</p>
+<pre><code class="hljs plaintext">https://www.google.com/search?q=python+%E7%99%BE%E5%88%86%E5%8F%B7%E7%BC%96%E7%A0%81</code></pre>
+<p><code>q=</code>之后是经过百分号编码的搜索词，其中：</p>
+<ul>
+<li><code>python</code>属于非保留字符（Unreserved Characters），保持不变；</li>
+<li>空格<code> </code>被替换成加号<code>+</code>；</li>
+<li><code>百分号编码</code>属于汉字，对应的UTF-8编码为<code>e799bee58886e58fb7e7bc96e7a081</code>，逐字节添加<code>%</code>前缀得到<code>%E7%99%BE%E5%88%86%E5%8F%B7%E7%BC%96%E7%A0%81</code>。</li>
+</ul>
+<h1 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h1><h2 id="Python"><a href="#Python" class="headerlink" title="Python"></a>Python</h2><pre><code class="hljs py"><span class="hljs-meta">&gt;&gt;&gt; </span><span class="hljs-keyword">import</span> urllib.parse <span class="hljs-keyword">as</span> pa
+<span class="hljs-meta">&gt;&gt;&gt; </span>pa.quote_plus(<span class="hljs-string">&quot;python 百分号编码&quot;</span>)
+<span class="hljs-string">&#x27;python+%E7%99%BE%E5%88%86%E5%8F%B7%E7%BC%96%E7%A0%81&#x27;</span></code></pre>
+
+<h2 id="JavaScript"><a href="#JavaScript" class="headerlink" title="JavaScript"></a>JavaScript</h2><blockquote>
+<p>For application&#x2F;x-www-form-urlencoded, spaces are to be replaced by +, so one may wish to follow a encodeURIComponent() replacement with an additional replacement of %20 with +.</p>
+</blockquote>
+<pre><code class="hljs js">&gt;&gt;&gt; <span class="hljs-built_in">encodeURIComponent</span>(<span class="hljs-string">&quot;JS 百分号编码&quot;</span>)
+&gt;&gt;&gt; <span class="hljs-string">&#x27;JS%20%E7%99%BE%E5%88%86%E5%8F%B7%E7%BC%96%E7%A0%81&#x27;</span></code></pre>
+
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><p><a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Percent-encoding">https://en.wikipedia.org/wiki/Percent-encoding</a><br><a target="_blank" rel="noopener" href="https://docs.python.org/3/library/urllib.parse.html#urllib.parse.quote_plus">https://docs.python.org/3/library/urllib.parse.html#urllib.parse.quote_plus</a><br><a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/encodeURIComponent">https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/encodeURIComponent</a></p>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+  
+
+</div>
+        <div class="footer-wrapper"><footer>
+    <div class="footer-container">
+        <div class="footer-meta">
+            
+            
+                <div class="footer-meta-license">
+                    Licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>
+                </div>
+            
+            <div>
+                Theme by <a target="_blank" rel="noopener" href="https://github.com/liuxiaotian/hexo-theme-lous">Lous</a>
+            </div>
+            <div>
+                Powered by <a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/">Hexo</a>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+    </div>
+</body>
+</html>
