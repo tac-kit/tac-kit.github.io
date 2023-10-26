@@ -58,6 +58,7 @@
 <li>空格<code> </code>被替换成加号<code>+</code>；</li>
 <li><code>百分号编码</code>属于汉字，对应的UTF-8编码为<code>e799bee58886e58fb7e7bc96e7a081</code>，逐字节添加<code>%</code>前缀得到<code>%E7%99%BE%E5%88%86%E5%8F%B7%E7%BC%96%E7%A0%81</code>。</li>
 </ul>
+<h1 id="加号"><a href="#加号" class="headerlink" title="加号"></a>加号</h1><p>加号<code>+</code>在部分场景下是空格<code> </code>的替代。<br><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/1634271/url-encoding-the-space-character-or-20">https://stackoverflow.com/questions/1634271/url-encoding-the-space-character-or-20</a><br>对于空格<code> </code>，客户端path里应该替换为<code>%20</code>，query里应该替换为<code>+</code>。<br>服务端解析query时，会将<code>+</code>解析为<code> </code>，将<code>%2B</code>解析为<code>+</code>。</p>
 <h1 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h1><h2 id="Python"><a href="#Python" class="headerlink" title="Python"></a>Python</h2><pre><code class="hljs py"><span class="hljs-meta">&gt;&gt;&gt; </span><span class="hljs-keyword">import</span> urllib.parse <span class="hljs-keyword">as</span> pa
 <span class="hljs-meta">&gt;&gt;&gt; </span>pa.quote_plus(<span class="hljs-string">&quot;python 百分号编码&quot;</span>)
 <span class="hljs-string">&#x27;python+%E7%99%BE%E5%88%86%E5%8F%B7%E7%BC%96%E7%A0%81&#x27;</span></code></pre>
