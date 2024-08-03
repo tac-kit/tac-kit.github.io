@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+    <link rel="shortcut icon" href="/images/avatar.png" type="image/x-icon" />
+    <title>
+        
+            笔记-依赖版本管理 |
+         
+        TK
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+    <div class="body-container">
+        <div class="header-wrapper"><header>
+    <div class="header-container">
+        <div class="header-menu-list">
+            <ul>
+            
+                <li>
+                    <a href="/">主页</a>
+                </li>
+            
+                <li>
+                    <a target="_blank" rel="noopener" href="https://github.com/tac-kit">GitHub</a>
+                </li>
+            
+            </ul>
+        </div>
+    </div>
+</header>
+</div>
+        <div class="main-wrapper"><main>
+    <div class="main-container">
+        <div class="post-details">
+            
+            <div class="post-title">
+                <h1>笔记-依赖版本管理</h1>
+            </div>
+            <div class="post-meta">
+                <span class="post-date">2024/08/03</span>
+            </div>
+            
+            <div class="post-content">
+                <h1 id="行业惯例"><a href="#行业惯例" class="headerlink" title="行业惯例"></a>行业惯例</h1><p><a target="_blank" rel="noopener" href="https://semver.org/lang/zh-CN/">语义化版本控制规范（SemVer）</a>是一种常见的软件版本命名方式。</p>
+<p>SemVer的主要规则为：</p>
+<blockquote>
+<p>版本格式：主版本号.次版本号.修订号，版本号递增规则如下：<br>主版本号：当你做了不兼容的 API 修改，<br>次版本号：当你做了向下兼容的功能性新增，<br>修订号：当你做了向下兼容的问题修正。<br>先行版本号及版本编译信息可以加到“主版本号.次版本号.修订号”的后面，作为延伸。  </p>
+</blockquote>
+<p>这段话里面有2个关键概念：向下兼容、API。怎么理解“向下兼容”？我认为不能将“向下兼容”理解为“任何可能的输入对应的输出都不会变”，这样的话就没有软件更新的必要了。因此，原文将主版本号的“不兼容”限定在了“API修改”范围内，次版本号和修订号只需要保证API层面的兼容性。</p>
+<p>以依赖包为例，从兼容性角度看，个人理解的SemVer规则是：</p>
+<ul>
+<li>修订号变更：只包含bug修复，无功能新增或修改，绝大多数调用方可以无感升级；</li>
+<li>次版本号变更：包含功能新增或修改，但已有接口的签名不变；绝大多数调用方的程序在升级后依然可以正常编译，但运行时的逻辑可能存在变化；</li>
+<li>主版本号变更：包含已有接口的删除或修改，相当一部分调用方的程序在升级后编译报错。</li>
+</ul>
+<h1 id="实践经验"><a href="#实践经验" class="headerlink" title="实践经验"></a>实践经验</h1><h2 id="修订版本可以无感升级吗？"><a href="#修订版本可以无感升级吗？" class="headerlink" title="修订版本可以无感升级吗？"></a>修订版本可以无感升级吗？</h2><p>一种常见的看法是，修订版本不存在破坏性变更，因此可以无感升级。例如，从<code>x.y.2</code>版本升级到<code>x.y.12</code>版本，虽然升了10个小版本，但因为只是修订版本的变更，所以也不需要专门测试。<br>在<strong>软件包严格遵循SemVer规则</strong>的前提下，上述看法是合理的。但是，很多软件包往往自定义一套版本号规则，或者干脆不按规则发版，导致“修订”版本也可能引入破坏性变更。<br>以JDK为例，从JDK 10开始，JDK版本号遵循一套<a target="_blank" rel="noopener" href="https://docs.oracle.com/en/java/javase/17/install/version-string-format.html">自定义的版本号规则</a>。这套规则的格式为<code>$FEATURE.$INTERIM.$UPDATE.$PATCH.</code>，具体来说：</p>
+<ul>
+<li>$FEATURE：功能版本号，可能包含不兼容变更。JDK每6个月发布一个功能更新，因此功能号每6个月递增一次。</li>
+<li>$INTERIM：中期版本号。在JDK现行的每6个月发布一个功能版本的模式下，不存在中期版本，因此中期版本号总是0。</li>
+<li>$UPDATE：更新版本号，包含安全问题修复、回退（regression）、bug修复等。每3个月递增一次。</li>
+<li>$PATCH：补丁版本号，包含紧急发布补丁。</li>
+</ul>
+<p>例如，自2021年9月发布至今，JDK 17一共发布了<a target="_blank" rel="noopener" href="https://www.oracle.com/java/technologies/javase/17u-relnotes.html">14个更新版本（包含2个补丁版本）</a>，最新版本号为<code>17.0.12</code>。</p>
+<p>基于JDK版本号的格式，我们可以得出一个<strong>貌似正确</strong>的结论：JDK将SemVer定义的“次版本号”并入“主版本号”并称为“功能版本号”，并且在每个功能版本内只发布较小的修订版本。因此，将JDK由<code>17.0.2</code>升级到<code>17.0.12</code>，<strong>似乎</strong>不需要经过全面测试就可以被发布上线。</p>
+<p>为了弄清楚“JDK修订版本能否无感升级”，我们来看下JDK的修订版本具体更新了哪些内容。JDK从<code>17.0.2</code>到<code>17.0.12</code>发生的变更很多，这里只举三方依赖库的例子：</p>
+<table>
+<thead>
+<tr>
+<th>三方依赖库</th>
+<th>JDK 17.0.2</th>
+<th>JDK 17.0.12</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>FreeType</td>
+<td>2.10.4</td>
+<td>2.13.2</td>
+</tr>
+<tr>
+<td>HarfBuzz</td>
+<td>2.8</td>
+<td>8.2.2</td>
+</tr>
+<tr>
+<td>libpng</td>
+<td>1.6.37</td>
+<td>1.6.40</td>
+</tr>
+<tr>
+<td>LCMS</td>
+<td>2.12</td>
+<td>2.16</td>
+</tr>
+<tr>
+<td>ICU4J</td>
+<td>67.1</td>
+<td>67.1</td>
+</tr>
+<tr>
+<td>Unicode</td>
+<td>13.0.0</td>
+<td>13.0.0</td>
+</tr>
+</tbody></table>
+<p>可见JDK的“修订”版本会更新三方依赖库的版本，并且三方依赖库的更新包含了次版本号更新甚至主版本号更新（例如HarfBuzz）。那么如果三方依赖库在中间某个版本引入了破坏性变更，JDK的“修订”版本自然也会包含这个变更，导致线上故障。<br>有同学会说，FreeType、HarfBuzz这些库都是在java.desktop路径下，服务端程序不会被这些依赖库的更新所影响，其实不然。比如在生成报表时我们往往需要在服务端渲染PDF，而itextpdf渲染PDF的时候就会调用FreeType实现文字的渲染。因此，FreeType的版本更新可能会影响报表的渲染效果，造成线上故障。</p>
+<p><strong>总结</strong>：修订版本能否无感升级，取决于具体每个软件包的版本号规则和规则执行情况。以JDK为例，它的修订版本是可能引入破坏性变更的，显然不能无感升级。比较稳妥的做法是，根据软件包的提交记录而非版本号来判断能否无感升级；<strong>任何依赖包版本的变更（包括修订版本变更），都需要经过完整的测试才能上线</strong>。</p>
+<h2 id="修复安全漏洞一定要升级到最新版吗？"><a href="#修复安全漏洞一定要升级到最新版吗？" class="headerlink" title="修复安全漏洞一定要升级到最新版吗？"></a>修复安全漏洞一定要升级到最新版吗？</h2><p>观察到这样两种现象：</p>
+<ol>
+<li>在修复依赖包安全漏洞时，安全部门的同事往往会指定一个特定的并且较高的软件版本，要求所有线上服务升级到这个版本。例如，为了解决fastjson的安全漏洞，将线上服务的fastjson版本从<code>1.2.4x</code>升级到<code>1.2.83</code>，过程中需要解决很多额外的代码兼容性问题，影响漏洞修复速度和服务稳定性。</li>
+<li>随日常迭代滚动更新依赖包，使得依赖包始终保持最新。这种做法在业务开发团队应该很少见😂，但JDK的确是这么做的。例如，JDK 17.0.9<a target="_blank" rel="noopener" href="https://bugs.openjdk.org/browse/JDK-8306881">将FreeType升级到2.13.0</a>，JDK 17.0.11又<a target="_blank" rel="noopener" href="https://bugs.openjdk.org/browse/JDK-8316028">将FreeType升级到2.13.2</a>，尽管FreeType的<code>2.13.x</code>版本并未修复任何安全漏洞或者增加大的功能。我理解JDK这么做可能是为了避免在遇到安全漏洞时跨版本升级。</li>
+</ol>
+<p>不评价上述两种做法的好坏，只介绍另一种解决方案：backport补丁。</p>
+<p>举例，在不同版本的Rocky Linux系统上执行命令<code>yum list installed | grep freetype</code>，得到的版本号是不一样的：</p>
+<table>
+<thead>
+<tr>
+<th>三方依赖库</th>
+<th>Rocky Linux 8.5</th>
+<th>Rocky Linux 8.10</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>FreeType</td>
+<td>2.9.1-4.el8_3.1</td>
+<td>2.9.1-9.el8</td>
+</tr>
+</tbody></table>
+<p>FreeType本身的版本号都是<code>2.9.1</code>，但后缀不同，后缀代表的就是backport补丁版本。补丁版本是由RHEL引入的，Rocky Linux作为RHEL的下游自然包含相同的软件包。对于RHEL 8.5，FreeType包的补丁版本为<code>4</code>；对于RHEL 8.10，FreeType包的补丁版本为<code>9</code>。<br>补丁版本是RPM包管理器的一项功能，具体可以参考<a target="_blank" rel="noopener" href="https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/8/html/packaging_and_distributing_software/preparing-software-for-rpm-packaging_packaging-and-distributing-software#patching-software_preparing-software-for-rpm-packaging">官方文档</a>。简单来说，RPM支持在原始版本代码的基础上，通过git diff的方式引入代码变更，从而修复漏洞或bug。<br>通过下载RPM包的源码，我们可以很清楚地看到补丁功能的原理。  </p>
+<p>在Rocky Linux 8.10上执行以下命令，下载并解压RPM源码包：</p>
+<pre><code class="hljs shell">yum install yum-utils
+yumdownloader --source freetype.x86_64
+rpm2cpio freetype-2.9.1-9.el8.src.rpm | cpio -ivdm</code></pre>
+
+<p>当前目录下会新增这些文件：</p>
+<pre><code class="hljs shell">-rw-r--r-- 1 root root  618 Sep 30  2022 freetype-2.2.1-enable-valid.patch
+-rw-r--r-- 1 root root  618 Sep 30  2022 freetype-2.3.0-enable-spr.patch
+-rw-r--r-- 1 root root  460 Sep 30  2022 freetype-2.5.2-more-demos.patch
+-rw-r--r-- 1 root root  340 Sep 30  2022 freetype-2.6.5-libtool.patch
+-rw-r--r-- 1 root root 2.0K Sep 30  2022 freetype-2.8-multilib.patch
+-rw-r--r-- 1 root root  876 Sep 30  2022 freetype-2.9.1-avoid-invalid-face-index.patch
+-rw-r--r-- 1 root root 5.1K Sep 30  2022 freetype-2.9.1-covscan.patch
+-rw-r--r-- 1 root root  754 Sep 30  2022 freetype-2.9.1-guard-face-size.patch
+-rw-r--r-- 1 root root 1.4K Sep 30  2022 freetype-2.9.1-png-bitmap-size.patch
+-rw-r--r-- 1 root root  789 Sep 30  2022 freetype-2.9.1-png-memory-leak.patch
+-rw-r--r-- 1 root root 1.2K Sep 30  2022 freetype-2.9.1-properly-guard-face-index.patch
+-rw-rw-r-- 1 root root 1.9M Sep 30  2022 freetype-2.9.1.tar.bz2
+-rw-r--r-- 1 root root  516 Sep 30  2022 freetype-2.9.1-windres.patch
+-rw-r--r-- 1 root root 2.9K Sep 30  2022 freetype-2.9-ftsmooth.patch
+-rw-rw-r-- 1 root root 2.1M Sep 30  2022 freetype-doc-2.9.1.tar.bz2
+-rw-r--r-- 1 root root  35K Sep 30  2022 freetype.spec
+-rw-rw-r-- 1 root root 228K Sep 30  2022 ft2demos-2.9.1.tar.bz2
+-rw-r--r-- 1 root root  257 Sep 30  2022 ftconfig.h</code></pre>
+<p>可见RPM源码包<code>freetype-2.9.1-9.el8.src.rpm</code>主要包含3个部分：</p>
+<ul>
+<li>FreeType 2.9.1官方发布的源码<code>freetype-2.9.1.tar.bz2</code></li>
+<li>若干后缀为<code>.patch</code>的补丁文件</li>
+<li>配置文件<code>freetype.spec</code></li>
+</ul>
+<p>对于补丁文件，以<code>freetype-2.9.1-guard-face-size.patch</code>为例，它的内容为：</p>
+<pre><code class="hljs c">From <span class="hljs-number">0</span>c2bdb01a2e1d24a3e592377a6d0822856e10df2 Mon Sep <span class="hljs-number">17</span> <span class="hljs-number">00</span>:<span class="hljs-number">00</span>:<span class="hljs-number">00</span> <span class="hljs-number">2001</span>
+From: Werner Lemberg &lt;wl@gnu.org&gt;
+Date: Sat, <span class="hljs-number">19</span> Mar <span class="hljs-number">2022</span> <span class="hljs-number">09</span>:<span class="hljs-number">37</span>:<span class="hljs-number">28</span> +<span class="hljs-number">0100</span>
+Subject: [PATCH] * src/base/ftobjs.c (FT_Request_Size): Guard `face-&gt;size`.
+
+Fixes #<span class="hljs-number">1140.</span>
+---
+ src/base/ftobjs.c | <span class="hljs-number">3</span> +++
+ <span class="hljs-number">1</span> file changed, <span class="hljs-number">3</span> insertions(+)
+
+diff --git a/src/base/ftobjs.c b/src/base/ftobjs.c
+index <span class="hljs-number">6492</span>a1517.<span class="hljs-number">.282</span>c9121a <span class="hljs-number">100644</span>
+--- a/src/base/ftobjs.c
++++ b/src/base/ftobjs.c
+@@ <span class="hljs-number">-3409</span>,<span class="hljs-number">6</span> +<span class="hljs-number">3409</span>,<span class="hljs-number">9</span> @@
+     <span class="hljs-keyword">if</span> ( !face )
+       <span class="hljs-keyword">return</span> FT_THROW( Invalid_Face_Handle );
+ 
++    <span class="hljs-keyword">if</span> ( !face-&gt;size )
++      <span class="hljs-keyword">return</span> FT_THROW( Invalid_Size_Handle );
++
+     <span class="hljs-keyword">if</span> ( !req || req-&gt;width &lt; <span class="hljs-number">0</span> || req-&gt;height &lt; <span class="hljs-number">0</span> ||
+          req-&gt;type &gt;= FT_SIZE_REQUEST_TYPE_MAX )
+       <span class="hljs-keyword">return</span> FT_THROW( Invalid_Argument );
+-- 
+<span class="hljs-number">2.35</span><span class="hljs-number">.1</span></code></pre>
+
+<p>通过补丁文件内容可以发现：</p>
+<ul>
+<li>RPM补丁文件以git diff格式保存代码变更，变更内容就是一个git commit，甚至在GitHub上能找到<a target="_blank" rel="noopener" href="https://github.com/freetype/freetype/commit/0c2bdb01a2e1d24a3e592377a6d0822856e10df2">原始提交</a>；</li>
+<li>RPM补丁功能能够将新提交合入老版本。FreeType <code>2.9.1</code>发布于2018年5月，而这个补丁提交于2022年3月19日。如果没有补丁功能，用户只能通过将FreeType升级到<code>2.12.0</code>才能获得这个bugfix；得益于补丁功能，用户只需要升级到<code>2.9.1-9</code>这个补丁版本，<strong>避免其它功能受到影响</strong>。</li>
+</ul>
+<p>此外，freetype.spec文件也包含很多信息，例如所有补丁版本的发布说明，这里不赘述。</p>
+<p>回过头来看RHEL，可以发现RHEL保证了在同一个大版本（例如RHEL 8，或者说CentOS 8、Rocky Linux 8）内的三方依赖库版本的一致性。例如从RHEL 8.5到8.10，FreeType一直是2.9.1版没有变，只是通过补丁机制将新版本中重要的bugfix合入2.9.1版的代码。这或许是一种值得借鉴的做法。</p>
+<p>Java生态内其实也有类似的做法。例如在2022年，fastjson就<a target="_blank" rel="noopener" href="https://github.com/alibaba/fastjson/wiki/security_update_20220523#34-noneautotype%E7%89%88%E6%9C%AC">发布了很多老版本的noneautotype包</a>，在修复漏洞的同时保证了代码逻辑的兼容性。</p>
+<p><strong>总结</strong>：修复安全漏洞一定要升级到最新版吗？不一定，通过backport修复代码到历史版本也同样能解决问题。</p>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+  
+
+</div>
+        <div class="footer-wrapper"><footer>
+    <div class="footer-container">
+        <div class="footer-meta">
+            
+            
+                <div class="footer-meta-license">
+                    Licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>
+                </div>
+            
+            <div>
+                Theme by <a target="_blank" rel="noopener" href="https://github.com/liuxiaotian/hexo-theme-lous">Lous</a>
+            </div>
+            <div>
+                Powered by <a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/">Hexo</a>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+    </div>
+</body>
+</html>
